@@ -63,3 +63,23 @@ export const UserLogin = async (req, res, next) => {
       return next(error);
     }
   };
+
+  export const getUserDashboard = async (req, res, next) => {
+    try {
+      const userId = req.user?.id;
+      const user = await User.findById(userId);
+      if (!user) {
+        return next(createError(404, "User not found"));
+      } 
+    }catch (err) {
+        next(err);
+      
+      }
+
+  };
+
+    
+  
+      
+
+    
