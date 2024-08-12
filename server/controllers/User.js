@@ -187,6 +187,44 @@ export const UserLogin = async (req, res, next) => {
   };
   
 
+  export const getWorkoutsByDate = async (req, res, next) => {
+    try {
+      const userId = req.user?.id;
+      const user = await User.findById(userId);
+      let date = req.query.date ? new Date(req.query.date) : new Date();
+      if (!user) {
+        return next(createError(404, "User not found"));
+      }
+      const startOfDay = new Date(
+        date.getFullYear(),
+        date.getMonth(),
+        date.getDate()
+      );
+      const endOfDay = new Date(
+        date.getFullYear(),
+        date.getMonth(),
+        date.getDate() + 1
+      );
+  
+      const todaysWorkouts = await Workout.find({
+        userId: userId,
+        date: { $gte: startOfDay, $lt: endOfDay },
+      });
+      const totalCaloriesBurnt = todaysWorkouts.reduce(
+        (total, workout) => total + workout.caloriesBurned,
+        0
+      );
+  
+      return res.status(200).json({ todaysWorkouts, totalCaloriesBurnt });
+    } catch (err) {
+      next(err);
+    }
+  };
+
+
+
+
+
   export const addWorkout = async (req, res, next) => {
     try {
       const userId = req.user?.id;
